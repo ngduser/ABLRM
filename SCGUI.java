@@ -27,7 +27,9 @@ public class SCGUI extends JFrame{
     final JComboBox <String> items_combo;
     final JTextField search_field;
     private JTextArea text_area;
-    
+
+    static final long serialVersionUID= 89733127L
+	
     //Creates GUI and calls addDataFile method to choose data file
     SCGUI(){
         theCave= new Cave();
