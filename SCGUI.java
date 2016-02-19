@@ -4,7 +4,6 @@
 // Purpose: Create GUI, select data files, instantiate and populate classes
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,6 +26,7 @@ public class SCGUI extends JFrame{
     final JButton select_button, search_button, show_button, clear_button;
     final JComboBox <String> items_combo;
     final JTextField search_field;
+    private JTextArea text_area;
     
     //Creates GUI and calls addDataFile method to choose data file
     SCGUI(){
@@ -36,20 +36,25 @@ public class SCGUI extends JFrame{
         setSize (700, 200);
         setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         setVisible (true);
+	
         
         select_button= new JButton("Select");
         show_button= new JButton("Show");
         search_button= new JButton("Search");
         clear_button= new JButton("Clear Data");
-        
+
+	text_area= new JTextArea();
         search_field= new JTextField(10);
         items_combo= new JComboBox<>();
         items_combo.addItem("Name");
         items_combo.addItem("Type");
         items_combo.addItem("Index");
         
-        JLabel search_label= new JLabel ("Search");
+	JLabel search_label= new JLabel ("Search");
         JPanel panel= new JPanel();
+        JScrollPane scroll_pane= new JScrollPane(text_area);
+        scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        add(scroll_pane, BorderLayout.CENTER);
         
         panel.add(clear_button);
         panel.add(select_button);
@@ -109,19 +114,11 @@ public class SCGUI extends JFrame{
     
     //Displays string called with in text area
     private void showCave(String data_output){
-            
-        JTextArea text_area= new JTextArea(data_output);
-        text_area.setFont(new Font("Century Gothic", Font.BOLD, 16));
         text_area.setLineWrap(true);
+        text_area.setText(data_output);
        
-
-        JScrollPane scroll_pane= new JScrollPane(text_area);
-        scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scroll_pane, BorderLayout.CENTER);
-
-        setSize (700, 600);
+        setSize (700, 700);
         revalidate();
-        validate();
     }
     
     //Determines which (if any) method to send each line for object creation
@@ -312,11 +309,4 @@ public class SCGUI extends JFrame{
         }
         showCave(display);
     }
-} 
-       
-    
-               
-                    
-    
-    
-
+}
