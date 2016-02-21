@@ -1,5 +1,5 @@
 // File: SCGUI.java
-// Date: Jan 25, 2016
+// Date: Feb 25, 2016
 // Author: Nathan Denig
 // Purpose: Create GUI, select data files, instantiate and populate classes
 
@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,7 @@ public class SCGUI extends JFrame{
     final JTextField search_field;
     private JTextArea text_area;
 
-    static final long serialVersionUID= 89733127L
+    static final long serialVersionUID= 89733127L;
 	
     //Creates GUI and calls addDataFile method to choose data file
     SCGUI(){
@@ -125,108 +126,81 @@ public class SCGUI extends JFrame{
     
     //Determines which (if any) method to send each line for object creation
     final void readFile(File file) throws FileNotFoundException{
+        
+        HashMap<Integer, Object> parent_map= new HashMap<>();
+        
         Scanner scan= new Scanner(file);
         scan.useDelimiter(System.getProperty("line.separator"));
             
         while(scan.hasNext()){
             
             String element= scan.next();
+            Scanner element_scan= new Scanner(element);
+            element_scan.useDelimiter(":");
             
             if (!"".equals(element)){
                
                 char element_type= element.charAt(0);
 
                 if (element_type== 'p'){
-                    addParty(element);
+                    Party party_add= new Party();
+        
+                    element_scan.next();
+                    party_add.index= Integer.parseInt(element_scan.next().trim());
+                    party_add.name= element_scan.next().trim();
+                    
+                    parent_map.put(party_add.index, party_add);
+                    theCave.parties.add(party_add);   
                 }
                 else if(element_type== 'c'){
-                    addCreature(element);
+                    Creature creature_add= new Creature();
+        
+                    element_scan.next();
+                    creature_add.index= Integer.parseInt(element_scan.next().trim());
+                    creature_add.type= element_scan.next().trim();
+                    creature_add.name= element_scan.next().trim();
+                    creature_add.party= Integer.parseInt(element_scan.next().trim());
+                    creature_add.empathy= Integer.parseInt(element_scan.next().trim());
+                    creature_add.fear= Integer.parseInt(element_scan.next().trim());
+                    creature_add.carrying= Double.parseDouble(element_scan.next().trim());
+                    
+                    Party party= (Party)parent_map.get(creature_add.party);
+                    party.creatures.add(creature_add);
+                    
+                    parent_map.put(creature_add.index, creature_add);
+                    
                 }
                 else if(element_type== 't'){
-                    addTreasure(element);
+                    Treasure treasure_add= new Treasure();
+        
+                    element_scan.next();
+                    treasure_add.index= Integer.parseInt(element_scan.next().trim());
+                    treasure_add.type= element_scan.next().trim();
+                    treasure_add.creature= Integer.parseInt(element_scan.next().trim());
+                    treasure_add.weight= Double.parseDouble(element_scan.next().trim());
+                    treasure_add.value= Double.parseDouble(element_scan.next().trim());
+
+                    Creature creature= (Creature)parent_map.get(treasure_add.creature);
+                    creature.treasures.add(treasure_add);
+                    
+                    parent_map.put(treasure_add.index, treasure_add);  
                 }
                 else if(element_type== 'a'){
-                    addArtifact(element);
+                    Artifact artifact_add= new Artifact();
+        
+                    element_scan.next();
+                    artifact_add.index= Integer.parseInt(element_scan.next().trim());
+                    artifact_add.type= element_scan.next().trim();
+                    artifact_add.creature= Integer.parseInt(element_scan.next().trim());
+                    artifact_add.name= element_scan.next().trim();
+
+                    Creature creature= (Creature)parent_map.get(artifact_add.creature);
+                    creature.artifacts.add(artifact_add);
+                    
+                    parent_map.put(artifact_add.index, artifact_add);     
                 }
             }
         }     
-    }
-    
-    //Creates party object
-    final void addParty(String element){
-        Scanner scan= new Scanner(element);
-        scan.useDelimiter(":");
-        
-        Party party_add= new Party();
-        
-        scan.next();
-        party_add.index= Integer.parseInt(scan.next().trim());
-        party_add.name= scan.next().trim();
-        
-        theCave.parties.add(party_add);       
-    }
-    
-    //Creates creature object
-    final void addCreature(String element){
-        Scanner scan= new Scanner(element);
-        scan.useDelimiter(":");
-        
-        Creature creature_add= new Creature();
-        
-        scan.next();
-        creature_add.index= Integer.parseInt(scan.next().trim());
-        creature_add.type= scan.next().trim();
-        creature_add.name= scan.next().trim();
-        creature_add.party= Integer.parseInt(scan.next().trim());
-        creature_add.empathy= Integer.parseInt(scan.next().trim());
-        creature_add.fear= Integer.parseInt(scan.next().trim());
-        creature_add.carrying= Double.parseDouble(scan.next().trim());
-        
-        theCave.parties.stream().filter((party) -> (party.index == creature_add.party)).forEach((party) -> {
-            party.creatures.add(creature_add);
-        });
-    }
-    
-    //Creates treasure object
-    final void addTreasure(String element){
-        Scanner scan= new Scanner(element);
-        scan.useDelimiter(":");
-        
-        Treasure treasure_add= new Treasure();
-        
-        scan.next();
-        treasure_add.index= Integer.parseInt(scan.next().trim());
-        treasure_add.type= scan.next().trim();
-        treasure_add.creature= Integer.parseInt(scan.next().trim());
-        treasure_add.weight= Double.parseDouble(scan.next().trim());
-        treasure_add.value= Double.parseDouble(scan.next().trim());
-        
-        
-        theCave.parties.stream().forEach((party) -> {
-            party.creatures.stream().filter((creature) -> (creature.index == treasure_add.creature)).forEach((creature) -> {
-                creature.treasures.add(treasure_add);
-            });
-        });    
-    }
-    
-    //Creates artifact object
-    final void addArtifact(String element){
-        Scanner scan= new Scanner(element);
-        scan.useDelimiter(":");
-        
-        Artifact artifact_add= new Artifact();
-        
-        scan.next();
-        artifact_add.index= Integer.parseInt(scan.next().trim());
-        artifact_add.type= scan.next().trim();
-        artifact_add.creature= Integer.parseInt(scan.next().trim());
-        artifact_add.name= scan.next().trim();
-        
-        theCave.parties.stream().forEach((party) -> {
-            party.creatures.stream().filter((creature) -> (creature.index == artifact_add.creature)).forEach((creature) -> {
-                creature.artifacts.add(artifact_add);
-            });
-        });    
     }
     
     //Searches based on parameters
