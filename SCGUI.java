@@ -1,14 +1,17 @@
 // File: SCGUI.java
-// Date: Feb 25, 2016
+// Date: Jan 25, 2016
 // Author: Nathan Denig
 // Purpose: Create GUI, select data files, instantiate and populate classes
 
+
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -24,11 +27,11 @@ import javax.swing.JTextField;
 public class SCGUI extends JFrame{
     
     private Cave theCave;
-    final JButton select_button, search_button, show_button, clear_button;
-    final JComboBox <String> items_combo;
+    final JButton select_button, search_button, show_button, clear_button, sort_button;
+    final JComboBox <String> items_combo, items_sort;
     final JTextField search_field;
-    private JTextArea text_area;
-
+    JTextArea text_area;
+    
     static final long serialVersionUID= 89733127L;
 	
     //Creates GUI and calls addDataFile method to choose data file
@@ -36,24 +39,31 @@ public class SCGUI extends JFrame{
         theCave= new Cave();
         
         setTitle ("Sorcerer's Cave Program");
-        setSize (700, 200);
+        setSize (1000, 200);
         setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         setVisible (true);
-	
-        
-        select_button= new JButton("Select");
+
+	text_area= new JTextArea();
+	select_button= new JButton("Select Data File");
         show_button= new JButton("Show");
         search_button= new JButton("Search");
         clear_button= new JButton("Clear Data");
-
-	text_area= new JTextArea();
+        sort_button= new JButton("Sort");
+        
         search_field= new JTextField(10);
         items_combo= new JComboBox<>();
         items_combo.addItem("Name");
         items_combo.addItem("Type");
         items_combo.addItem("Index");
         
-	JLabel search_label= new JLabel ("Search");
+        items_sort= new JComboBox<>();
+        items_sort.addItem("Creature Empathy");
+        items_sort.addItem("Creature Fear");
+        items_sort.addItem("Creature Carrying");
+        items_sort.addItem("Treasure Weight");
+        items_sort.addItem("Treasure Value");
+        
+        JLabel search_label= new JLabel ("Search");
         JPanel panel= new JPanel();
         JScrollPane scroll_pane= new JScrollPane(text_area);
         scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -62,6 +72,8 @@ public class SCGUI extends JFrame{
         panel.add(clear_button);
         panel.add(select_button);
         panel.add(show_button);
+        panel.add(items_sort);
+        panel.add(sort_button);
         panel.add(items_combo);
         panel.add(search_label);
         panel.add(search_field);
@@ -80,6 +92,11 @@ public class SCGUI extends JFrame{
             String item_type= (String)items_combo.getSelectedItem();
             String item_name= (String)search_field.getText();
             searchGame(item_type, item_name);
+        });
+
+	sort_button.addActionListener((ActionEvent e) ->{
+            String field= (String)items_sort.getSelectedItem();
+            compareFields(field); 
         });
          
         select_button.addActionListener((ActionEvent e) -> {
@@ -285,4 +302,111 @@ public class SCGUI extends JFrame{
         }
         showCave(display);
     }
+    
+    void compareFields(String field){
+        String sort= "No applicable assets entered yet";
+        
+        if ("Creature Fear".equals(field)){
+            sort= "--FEAR Ratings--\n";
+
+            for (Party party : theCave.parties){
+                sort= sort+ "Party- "+party+"\n";                    
+
+                TreeMap<Integer, String> field_tree= new TreeMap<>();
+
+                for (Creature creature : party.creatures){
+                    field_tree.put(creature.fear, creature.toString());
+                }
+
+                for (int key: field_tree.keySet()){
+                    sort= sort+ "   "+ field_tree.get(key);
+                    sort= sort      + "- "+ key+ "\n";
+                }
+            }             
+        }
+        else if ("Creature Empathy".equals(field)){
+            sort= "--Empathy Ratings--\n";
+
+            for (Party party : theCave.parties){
+                sort= sort+ "Party- "+party+"\n";                    
+
+                TreeMap<Integer, String> field_tree= new TreeMap<>();
+
+                for (Creature creature : party.creatures){
+                    field_tree.put(creature.empathy, creature.toString());
+                }
+
+                for (int key: field_tree.keySet()){
+                    sort= sort+ "   "+ field_tree.get(key);
+                    sort= sort      + "- "+ key+ "\n";
+                }
+            }   
+        }
+        else if ("Creature Carrying".equals(field)){
+            sort= "--Carrying Ratings--\n";
+
+            for (Party party : theCave.parties){
+                sort= sort+ "Party- "+party+"\n";                    
+
+                TreeMap<Double, String> field_tree= new TreeMap<>();
+
+                for (Creature creature : party.creatures){
+                    field_tree.put(creature.carrying, creature.toString());
+                }
+
+                for (Double key: field_tree.keySet()){
+                    sort= sort+ "   "+ field_tree.get(key);
+                    sort= sort      + "- "+ key+ "\n";
+                }
+            }   
+        }
+        else if ("Treasure Weight".equals(field)){
+            sort= "--Weight Ratings--\n";
+
+            for (Party party : theCave.parties){
+                for (Creature creature : party.creatures){
+                    sort= sort+ "Creature- "+creature+"\n";                    
+                    TreeMap<Double, String> field_tree= new TreeMap<>();
+                    
+                    for (Treasure treasure : creature.treasures){
+                        field_tree.put(treasure.weight, treasure.toString());
+                    }
+                    
+                    for (Double key: field_tree.keySet()){
+                        sort= sort+ "   "+ field_tree.get(key);
+                        sort= sort      + "- "+ key+ "\n";
+                    }
+                
+                }
+            }   
+        }
+        else if ("Treasure Value".equals(field)){
+            sort= "--Value Ratings--\n";
+
+            for (Party party : theCave.parties){
+                for (Creature creature : party.creatures){
+                    sort= sort+ "Creature- "+creature+"\n";                    
+                    TreeMap<Double, String> field_tree= new TreeMap<>();
+                    
+                    for (Treasure treasure : creature.treasures){
+                        field_tree.put(treasure.value, treasure.toString());
+                    }
+                    
+                    for (Double key: field_tree.keySet()){
+                        sort= sort+ "   "+ field_tree.get(key);
+                        sort= sort      + "- "+ key+ "\n";
+                    }
+                
+                }
+            }   
+        }
+        
+        showCave(sort);
+        
+    }
+} 
+       
+    
+               
+                    
 }
