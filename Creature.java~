@@ -29,13 +29,7 @@ public class Creature {
         type=null;
         name=null;
     }
-
-    public synchronized void setJob(Jobs job){
-        
-        System.out.println(job.creature+ " starting job- "+ job.name);
-        
-        long sleep= (long) (job.time* 1000);
-        
+    
     public String printItems(){
         data_output= "";
         
@@ -44,6 +38,7 @@ public class Creature {
             data_output= data_output+ "                       "+ artifact+ "\n";
         });
         
+       
         data_output= data_output+ "\n                 -----TREASURES-----\n\n";
         treasures.stream().forEach((treasure) -> {
             data_output= data_output+"                       "+ treasure+ "\n";
