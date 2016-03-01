@@ -1,12 +1,21 @@
+
 // File: Creature.java
 // Date: Jan 25, 2016
 // Author: Nathan Denig
 // Purpose: Creature class holds Artifact and Treasure lists
 // and formats output while holding attribute fields
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
 
-//Creature holds artifact and treasure lists
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 public class Creature {
     ArrayList <Artifact> artifacts;
     ArrayList <Treasure> treasures;
@@ -15,8 +24,13 @@ public class Creature {
     String type, name;
     private String data_output;
     double carrying;
+    Jobs current_job;
+    DefaultMutableTreeNode creature;
+    JProgressBar progress_bar; 
+    JPanel panel;
+    JFrame frame;
+    boolean paused;
     
-    //Default empty values
     Creature(){
         artifacts= new ArrayList<>();
         treasures= new ArrayList<>();
@@ -25,9 +39,10 @@ public class Creature {
         empathy= 0;
         fear=0;
         carrying=0;
+        paused= false;
         
         type=null;
-        name=null;
+        name=null;        
     }
     
     public synchronized void setJob(Jobs job){
@@ -50,12 +65,12 @@ public class Creature {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-	    progress_bar.setValue(99);
-            System.out.println(job.creature+ " finished job- "+ job.name);
+                progress_bar.setValue(99);
+       
+                System.out.println(job.creature+ " finished job- "+ job.name);
                 frame.dispose();
     }
-        
+    
     public String printItems(){
         data_output= "";
         
@@ -64,6 +79,7 @@ public class Creature {
             data_output= data_output+ "                       "+ artifact+ "\n";
         });
         
+       
         data_output= data_output+ "\n                 -----TREASURES-----\n\n";
         treasures.stream().forEach((treasure) -> {
             data_output= data_output+"                       "+ treasure+ "\n";
@@ -72,7 +88,7 @@ public class Creature {
         data_output= data_output+ "\n";
         return data_output;
     }
-
+    
     private void buildGUI(){
         progress_bar= new JProgressBar();
     
@@ -87,10 +103,19 @@ public class Creature {
         frame = new JFrame(name);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(panel);
-        frame. setSize(200, 100);   
+        frame. setSize(200, 100);
+     
+   
+        
+
+        
+        
+        
         frame.setVisible(true);
+        
+   
     }
-    
+   
     public String printFields(){
         String fields= "NAME- "+ name+ "\nINDEX- "+ index+ "\nPARTY- "+ party+ "\nEMPATHY- "
                 +empathy+ "\nFEAR- "+ fear+ "\nCARRYING- "+ carrying;
