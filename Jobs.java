@@ -1,9 +1,9 @@
 // File: Jobs.java
 // Date: Feb 29, 2016
 // Author: Nathan Denig
-// Purpose: Create Job Threads for creature setJobs method
+// Purpose: Create Job Runnable for creature setJobs threads
 
-public class Jobs extends Thread{
+public class Jobs implements Runnable{
     
     int index, creature_index;
     String name;

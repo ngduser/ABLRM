@@ -227,8 +227,9 @@ public class SCGUI extends JFrame{
                     
                     Creature creature= (Creature)parent_map.get(job_add.creature_index);
                     job_add.creature= creature;
-                    
-                    job_add.start();   
+
+		    Thread new_thread= new Thread(job_add);
+                    new_thread.start();
                 }
             }
         }     
