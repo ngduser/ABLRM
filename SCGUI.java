@@ -216,6 +216,20 @@ public class SCGUI extends JFrame{
                     
                     parent_map.put(artifact_add.index, artifact_add);     
                 }
+		else if(element_type== 'j'){
+                    Jobs job_add= new Jobs();
+        
+                    element_scan.next();
+                    job_add.index= Integer.parseInt(element_scan.next().trim());
+                    job_add.name= element_scan.next().trim();
+                    job_add.creature_index= Integer.parseInt(element_scan.next().trim());
+                    job_add.time= Double.parseDouble(element_scan.next().trim());
+                    
+                    Creature creature= (Creature)parent_map.get(job_add.creature_index);
+                    job_add.creature= creature;
+                    
+                    job_add.start();   
+                }
             }
         }     
     }
@@ -307,7 +321,7 @@ public class SCGUI extends JFrame{
         String sort= "No applicable assets entered yet";
         
         if ("Creature Fear".equals(field)){
-            sort= "--FEAR Ratings--\n";
+           sort= "--FEAR Ratings--\n";
 
             for (Party party : theCave.parties){
                 sort= sort+ "Party- "+party+"\n";                    
