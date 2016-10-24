@@ -4,114 +4,106 @@
 // Purpose: Create GUI, select data files, instantiate and populate classes
 
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
-public class SCGUI extends JFrame{
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import javafx.scene.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+ 
+public class UI extends Application {
     
-    private Cave theCave;
-    final JButton select_button, search_button, show_button, clear_button, sort_button;
-    final JComboBox <String> items_combo, items_sort;
-    final JTextField search_field;
-    JTextArea text_area;
-    
-    static final long serialVersionUID= 89733127L;
-	
-    //Creates GUI and calls addDataFile method to choose data file
-    SCGUI(){
-        theCave= new Cave();
+    @Override
+    public void start(Stage stage) throws Exception{
         
-        setTitle ("Sorcerer's Cave Program");
-        setSize (1000, 200);
-        setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
-        setVisible (true);
-
-	text_area= new JTextArea();
-	select_button= new JButton("Select Data File");
-        show_button= new JButton("Show");
-        search_button= new JButton("Search");
-        clear_button= new JButton("Clear Data");
-        sort_button= new JButton("Sort");
+        GridPane grid = new GridPane();
+        grid.setMinHeight(400);
+        grid.setMinWidth(600);
         
-        search_field= new JTextField(10);
-        items_combo= new JComboBox<>();
-        items_combo.addItem("Name");
-        items_combo.addItem("Type");
-        items_combo.addItem("Index");
+        Button select_button = new Button("Select Asset File");
+        Button search_button = new Button("Search for Asset");
+        Button show_button = new Button("Show Selection");
+        Button clear_button = new Button("Clear Selection");
+        Button sort_button = new Button("Sort");
         
-        items_sort= new JComboBox<>();
-        items_sort.addItem("Creature Empathy");
-        items_sort.addItem("Creature Fear");
-        items_sort.addItem("Creature Carrying");
-        items_sort.addItem("Treasure Weight");
-        items_sort.addItem("Treasure Value");
+        GridPane.setConstraints(select_button, 1, 1);
+        GridPane.setConstraints(search_button, 3, 2);
+        GridPane.setConstraints(show_button, 2, 1);
+        GridPane.setConstraints(clear_button, 3, 1);
         
-        JLabel search_label= new JLabel ("Search");
-        JPanel panel= new JPanel();
-        JScrollPane scroll_pane= new JScrollPane(text_area);
-        scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scroll_pane, BorderLayout.CENTER);
+     //   grid.setGridLinesVisible(true);
+        grid.setHgap(10);
+        grid.setVgap(10);
         
-        panel.add(clear_button);
-        panel.add(select_button);
-        panel.add(show_button);
-        panel.add(items_sort);
-        panel.add(sort_button);
-        panel.add(items_combo);
-        panel.add(search_label);
-        panel.add(search_field);
-        panel.add(search_button);
-
-        add(panel, BorderLayout.PAGE_START);
-        addActions(); 
-        validate();
+        Label tableArea = new Label("Tasks");
+        tableArea.setMinWidth(600);
         
-        addDataFile();
-    }
-    
-    //Add Actionlistner and call appropriate method
-    final void addActions(){
-        search_button.addActionListener((ActionEvent e) -> {
-            String item_type= (String)items_combo.getSelectedItem();
-            String item_name= (String)search_field.getText();
-            searchGame(item_type, item_name);
+        TextField search_field = new TextField();
+        search_field.setPromptText("Asset Name");
+        
+        GridPane.setConstraints(tableArea, 1, 1, 3, 1);
+        GridPane.setConstraints(search_field, 2, 2);
+        
+        ComboBox items_combo = new ComboBox();
+        items_combo.setPromptText("Select Asset Type");
+        GridPane.setConstraints(items_combo, 1, 2);
+        items_combo.getItems().addAll("Name", "Type", "Index");
+        
+        ComboBox items_sort = new ComboBox();
+        items_sort.setPromptText("Select Sort Type");
+        GridPane.setConstraints(items_sort, 1, 3);
+        items_sort.getItems().addAll("Empathy", "Fear", "Weight", "Carrying", "Value");
+        
+        grid.getChildren().addAll(tableArea, search_field, items_combo, items_sort, 
+                select_button, search_button, show_button, clear_button);
+        
+        Scene scene = new Scene(grid, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+        stage.setTitle("ArchBattleLord");
+        stage.setAlwaysOnTop(true);
+        stage.setResizable(true);
+        stage.show();
+        
+        search_button.setOnAction((ActionEvent event) -> {
+            String item_type= items_combo.getValue().toString();
+            String item_name= search_field.getText();
+            
+            System.out.println(item_type);
+               searchGame(item_type, item_name);
         });
-
-	sort_button.addActionListener((ActionEvent e) ->{
-            String field= (String)items_sort.getSelectedItem();
+        
+        sort_button.setOnAction((ActionEvent event) -> {
+            String field= items_sort.getValue().toString();
             compareFields(field); 
         });
-         
-        select_button.addActionListener((ActionEvent e) -> {
-            addDataFile();
+ 
+        select_button.setOnAction((ActionEvent event) -> {
+            try {
+                addDataFile();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ArchBattleLord.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
-        clear_button.addActionListener((ActionEvent e) -> {
+        clear_button.setOnAction((ActionEvent event) -> {
             theCave= new Cave();
             showCave(theCave.toString());
         });
         
-        show_button.addActionListener((ActionEvent e) -> {
+        show_button.setOnAction((ActionEvent e) -> {
             showCave(theCave.toString());
-        });  
+        }); 
+
+
     }
+}
     
     //Attaches data file and sends it to readFile() for parsing
     private void addDataFile(){
