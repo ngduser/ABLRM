@@ -1,3 +1,4 @@
+package archbattlelord;
 // File: Creature.java
 // Date: Jan 25, 2016
 // Author: Nathan Denig
@@ -31,6 +32,8 @@ public class Creature {
     }
     
     public synchronized void setJob(Jobs job){
+       /*
+        
         buildGUI();
         
         System.out.println(job.creature+ " starting job- "+ job.name);
@@ -54,6 +57,7 @@ public class Creature {
 	    progress_bar.setValue(99);
             System.out.println(job.creature+ " finished job- "+ job.name);
                 frame.dispose();
+        */
     }
         
     public String printItems(){
@@ -73,7 +77,7 @@ public class Creature {
         return data_output;
     }
 
-    private void buildGUI(){
+ /*   private void buildGUI(){
         progress_bar= new JProgressBar();
     
         panel= new JPanel(); 
@@ -101,4 +105,5 @@ public class Creature {
     public String toString(){
         return name;
     }
+*/
 }
