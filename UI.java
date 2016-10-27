@@ -106,7 +106,6 @@ public class UI extends Application {
         show_button.setOnAction((ActionEvent e) -> {
      //       showCave(theCave.toString());
         }); 
-
-
+      
     }
 }
