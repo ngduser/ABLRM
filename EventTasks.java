@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
-import javafx.stage.FileChooser;
 
 public class EventTasks {
     
@@ -26,7 +26,6 @@ public class EventTasks {
         scan.useDelimiter(System.getProperty("line.separator"));
             
         while(scan.hasNext()){
-            
             String element= scan.next();
             Scanner element_scan= new Scanner(element);
             element_scan.useDelimiter(":");
@@ -36,68 +35,122 @@ public class EventTasks {
                 char element_type= element.charAt(0);
 
                 switch (element_type) {
-                    case 'p':   { System.out.println("ONE");
-                        Party party_add= new Party();
-                        element_scan.next();
-                        party_add.index= Integer.parseInt(element_scan.next().trim());
-                        party_add.name= element_scan.next().trim();
-                        parent_map.put(party_add.index, party_add);
-                        theCave.parties.add(party_add);
+                    case 'p': {
+                        Party party = new Party();
+                        
+                        try {
+                            element_scan.next();
+
+                            party.addAttributes("index", String.valueOf(element_scan.next().trim()));
+                            party.addAttributes("name", element_scan.next().trim());
+                         }catch(NoSuchElementException ex){
+                            System.out.println("Empty entry for Party!");
+                        }    
+                        
+                        theCave.addChild(party);
                         break;
                     }
                         
                     case 'c': {
-                        Creature creature_add= new Creature();
-                        element_scan.next();
-                        creature_add.index= Integer.parseInt(element_scan.next().trim());
-                        creature_add.type= element_scan.next().trim();
-                        creature_add.name= element_scan.next().trim();
-                        creature_add.party= Integer.parseInt(element_scan.next().trim());
-                        creature_add.empathy= Integer.parseInt(element_scan.next().trim());
-                        creature_add.fear= Integer.parseInt(element_scan.next().trim());
-                        creature_add.carrying= Double.parseDouble(element_scan.next().trim());
-                        Party party= (Party)parent_map.get(creature_add.party);
-                        party.creatures.add(creature_add);
-                        parent_map.put(creature_add.index, creature_add);
+                        Creature creature = new Creature();
+                 
+                        try {
+                            element_scan.next();
+
+                            creature.addAttributes("index", String.valueOf(element_scan.next().trim()));
+                            creature.addAttributes("type", element_scan.next().trim());
+                            creature.addAttributes("name", element_scan.next().trim());
+                            String parent = String.valueOf(element_scan.next().trim());
+                            creature.addAttributes("parent", parent);
+                            creature.addAttributes("empathy", String.valueOf(element_scan.next().trim()));
+                            creature.addAttributes("fear", String.valueOf(element_scan.next().trim()));
+                            creature.addAttributes("carrying", String.valueOf(element_scan.next().trim()));
+                        
+                        }catch(NoSuchElementException ex){
+                            System.out.println("Empty entry for Creature!");
+                        }        
+                        
+                        Party party = (Party) theCave.search(1, creature.attributes.get("parent"));
+                        if (party != null) {}                        
+                        else {
+                            party = (Party)theCave.children.get(0);
+                        }
+                        
+                        party.addChild(creature);
                         break;
                     }
-                        
+                           
                     case 't': { 
-                        Treasure treasure_add= new Treasure();
-                        element_scan.next();
-                        treasure_add.index= Integer.parseInt(element_scan.next().trim());
-                        treasure_add.type= element_scan.next().trim();
-                        treasure_add.creature= Integer.parseInt(element_scan.next().trim());
-                        treasure_add.weight= Double.parseDouble(element_scan.next().trim());
-                        treasure_add.value= Double.parseDouble(element_scan.next().trim());
-                        Creature creature= (Creature)parent_map.get(treasure_add.creature);
-                        creature.treasures.add(treasure_add);
-                        parent_map.put(treasure_add.index, treasure_add);
+                        Treasure treasure = new Treasure();
+                    
+                        try {    
+                            element_scan.next();
+
+                            treasure.addAttributes("index", String.valueOf(element_scan.next().trim()));
+                            treasure.addAttributes("type", element_scan.next().trim());
+                            String parent = String.valueOf(element_scan.next().trim());
+                            treasure.addAttributes("parent", parent);
+                            treasure.addAttributes("weight", String.valueOf(element_scan.next().trim()));
+                            treasure.addAttributes("value", String.valueOf(element_scan.next().trim()));
+                        
+                        }catch(NoSuchElementException ex){
+                            System.out.println("Empty entry for Treasure!");
+                        }
+                        
+                        Creature creature = (Creature) theCave.search(2, treasure.attributes.get("parent"));
+                        
+                        if (creature != null) {}                        
+                        else {
+                            Party party = (Party) theCave.children.get(0);
+                            creature = (Creature) party.children.get(0);
+                        }
+                        
+                        System.out.println(creature);
+                        creature.addChild(treasure);
                         break;
                     }
 
                     case 'a': {
-                        Artifact artifact_add= new Artifact();
-                        element_scan.next();
-                        artifact_add.index= Integer.parseInt(element_scan.next().trim());
-                        artifact_add.type= element_scan.next().trim();
-                        artifact_add.creature= Integer.parseInt(element_scan.next().trim());
-                        artifact_add.name= element_scan.next().trim();
-                        Creature creature= (Creature)parent_map.get(artifact_add.creature);
-                        creature.artifacts.add(artifact_add);
-                        parent_map.put(artifact_add.index, artifact_add);
+                        Artifact artifact = new Artifact();
+                       
+                        try { 
+                            element_scan.next();
+                            artifact.addAttributes("index", String.valueOf(element_scan.next().trim()));
+                            artifact.addAttributes("type", element_scan.next().trim());
+                            String parent = String.valueOf(element_scan.next().trim());
+                            artifact.addAttributes("parent", parent);
+                            artifact.addAttributes("name", element_scan.next().trim());
+                        
+                        }catch(NoSuchElementException ex){
+                            System.out.println("Empty entry for Artifact!");
+                        }
+                        
+                        Creature creature = (Creature) theCave.search(2, artifact.attributes.get("parent"));
+                        
+                        if (creature != null) {}                        
+                        else {
+                            Party party = (Party) theCave.children.get(0);
+                            creature = (Creature) party.children.get(1);
+                        }
+                        creature.addChild(artifact);
                         break;
                     }
                     
                     case 'j': {
                         Jobs job_add= new Jobs();
-                        element_scan.next();
-                        job_add.index= Integer.parseInt(element_scan.next().trim());
-                        job_add.name= element_scan.next().trim();
-                        job_add.creature_index= Integer.parseInt(element_scan.next().trim());
-                        job_add.time= Double.parseDouble(element_scan.next().trim());
-                        Creature creature= (Creature)parent_map.get(job_add.creature_index);
-                        job_add.creature= creature;
+                        
+                        try {
+                            element_scan.next();
+                            job_add.index= Integer.parseInt(element_scan.next().trim());
+                            job_add.name= element_scan.next().trim();
+                            job_add.creature_index= Integer.parseInt(element_scan.next().trim());
+                            job_add.time= Double.parseDouble(element_scan.next().trim());
+                            Creature creature= (Creature)parent_map.get(job_add.creature_index);
+                            job_add.creature= creature;
+                        
+                        }catch(NoSuchElementException ex){
+                            System.out.println("Empty entry for party_add!");
+                        }
 
 //		    Thread new_thread= new Thread(job_add);
 //                    new_thread.start();
@@ -108,6 +161,7 @@ public class EventTasks {
                         break;
                 }
             }
-        }     
+        }
+        theCave.toString();
     }
 }

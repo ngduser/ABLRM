@@ -17,7 +17,7 @@ public class Jobs implements Runnable{
     
     @Override
     public void run(){
-        creature.setJob(this);
+      //  creature.setJob(this);
         
     }
     
